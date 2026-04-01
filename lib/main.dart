@@ -1,13 +1,20 @@
 import 'package:acervo/pages/home.page.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; //Importando o pacote do Supabase Flutter
 
-void main() {
+Future<void> main() async { //Função principal do aplicativo, marcada como assíncrona para permitir a inicialização do Supabase.
+ 
+  WidgetsFlutterBinding.ensureInitialized(); //Garantindo que o Flutter esteja completamente inicializado antes de prosseguir.
+  await Supabase.initialize( //Inicializando o Supabase com as credenciais fornecidas.
+    url: 'https://aocsoypewmyaulaagklz.supabase.co',
+    anonKey: 'sb_publishable_xcExOS9YSNU5eBJGZxpdAQ_Q2OnibJy',
+  );
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -70,12 +77,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return HomePage();
+   
   }
 }
+
+
