@@ -23,5 +23,5 @@ class MyColors {
   static const Color cinzaClaro = Color(0xFFEDF0FF);
   static const Color cinzaNude = Color(0xFFCAC6BE);
   static const Color cinzaMedio = Color(0xFF7A7770);
-  static const Color cinzaEscuro = Color(0xFF494740)//lllllll
+  static const Color cinzaEscuro = Color(0xFF494740);//lllllll
 }
