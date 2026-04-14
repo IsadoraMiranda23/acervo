@@ -1,11 +1,15 @@
 import 'package:acervo/pages/home.page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/rendering.dart';
+import 'package:flutter/foundation.dart';
 void main() {
+  debugProfileBuildsEnabled = true;
+  debugProfilePaintsEnabled = true;
+  var debugPrintBuildScopes = true;
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {   //l
   const MyApp({super.key});
 
   // This widget is the root of your application.
