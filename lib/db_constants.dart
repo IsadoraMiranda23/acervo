@@ -1,5 +1,5 @@
 // Gabarito do arquivo de constantes do banco de dados. 
-
+//Qualquercoisa
 class DbTables {
   static const String livros = 'Livros';
   static const String resenhas = 'Resenhas';
