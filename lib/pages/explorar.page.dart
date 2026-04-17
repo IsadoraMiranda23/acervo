@@ -1,4 +1,5 @@
 import 'package:acervo/components/card_indicacao_book.component.dart';
+import 'package:acervo/components/carrossel.dart';
 import 'package:flutter/material.dart';
 import 'package:acervo/my_colors.dart'; // Importe suas cores
 
@@ -34,7 +35,7 @@ class _ExplorarPageState extends State<ExplorarPage> {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withAlpha(1),
                     spreadRadius: 1,
                     blurRadius: 5,
                     offset: const Offset(0, 2),
@@ -111,7 +112,43 @@ class _ExplorarPageState extends State<ExplorarPage> {
               ],
             ),
           ),
-          CardIndicacaoBookComponent(nomeLivro: "nomeLivro", nomeAutor: "nomeAutor")
+          Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: Carrossel(
+              livros: [
+                {
+                  'nomeLivro': 'Dom Casmurro',
+                  'nomeAutor': 'Machado de Assis',
+                  'imagemUrl': '',
+                },
+                {
+                  'nomeLivro': 'O Alquimista',
+                  'nomeAutor': 'Paulo Coelho',
+                  'imagemUrl': '',
+                },
+                {
+                  'nomeLivro': '1984',
+                  'nomeAutor': 'George Orwell',
+                  'imagemUrl': '',
+                },
+                {
+                  'nomeLivro': 'O Pequeno Príncipe',
+                  'nomeAutor': 'Antoine de Saint-Exupéry',
+                  'imagemUrl': '',
+                },
+                {
+                  'nomeLivro': 'A Culpa é das Estrelas',
+                  'nomeAutor': 'John Green',
+                  'imagemUrl': '',
+                },
+                {
+                  'nomeLivro': 'Harry Potter',
+                  'nomeAutor': 'J.K. Rowling',
+                  'imagemUrl': '',
+                },
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -119,7 +156,6 @@ class _ExplorarPageState extends State<ExplorarPage> {
 
   Widget _buildContent() {
     if (_searchQuery.isEmpty) {
-      // Quando não há busca, mostra conteúdo inicial
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -147,7 +183,6 @@ class _ExplorarPageState extends State<ExplorarPage> {
   }
 
   Widget _buildSearchResults() {
-    // A lógica de busca
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: 5,

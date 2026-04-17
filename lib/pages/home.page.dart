@@ -1,7 +1,6 @@
 import 'package:acervo/my_colors.dart';
 import 'package:flutter/material.dart';
 
-// Importe suas páginas aqui
 import 'package:acervo/pages/explorar.page.dart';
 import 'package:acervo/pages/pesquisa.page.dart';  // Crie depois
 import 'package:acervo/pages/lendo.page.dart';     // Crie depois
@@ -9,6 +8,7 @@ import 'package:acervo/pages/perfil.page.dart';    // Crie depois
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  static const routeName = '/Home';
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,12 +17,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Lista de páginas que serão exibidas
   final List<Widget> _paginas = [
-    const ExplorarPage(),   // Índice 0
-    const PesquisaPage(),   // Índice 1 - Crie esta página
-    const LendoPage(),      // Índice 2 - Crie esta página
-    const PerfilPage(),     // Índice 3 - Crie esta página
+    const ExplorarPage(),
+    const PesquisaPage(),
+    const LendoPage(),
+    const PerfilPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -47,13 +46,13 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           "ACERVO",
           style: TextStyle(
-            fontFamily: 'newheader',
+            fontFamily: 'Newheader',
             color: MyColors.abobora,
           ),
         ),
       ),
 
-      // ✅ Aqui está a mágica - o body muda conforme o índice
+
       body: _paginas[_selectedIndex],
 
       bottomNavigationBar: BottomNavigationBar(
