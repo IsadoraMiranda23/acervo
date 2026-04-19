@@ -28,7 +28,7 @@ class _CadastroPageState extends State<CadastroPage> {
         _isLoading = true;
       });
 
-      // TODO: Implementar lógica de cadastro
+      // TODO:mImplementar lógica de cadastro
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {
