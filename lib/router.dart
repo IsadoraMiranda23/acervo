@@ -1,3 +1,4 @@
+import 'package:acervo/pages/biblioteca.page.dart';
 import 'package:acervo/pages/cadastro.page.dart';
 import 'package:acervo/pages/login.page.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,10 @@ final router = GoRouter(
       name: HomePage.routeName,
       pageBuilder: (contex, state) => NoTransitionPage(child: HomePage()),
     ),
-
+    GoRoute(
+      path: BibliotecaPage.routeName,
+      name: BibliotecaPage.routeName,
+      pageBuilder: (contex, state) => NoTransitionPage(child: BibliotecaPage()),
+    ),
   ],
 );

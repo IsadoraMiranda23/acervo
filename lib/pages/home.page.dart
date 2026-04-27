@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:acervo/pages/explorar.page.dart';
 import 'package:acervo/pages/pesquisa.page.dart';  // Crie depois
-import 'package:acervo/pages/lendo.page.dart';     // Crie depois
+import 'package:acervo/pages/biblioteca.page.dart';     // Crie depois
 import 'package:acervo/pages/perfil.page.dart';    // Crie depois
 
 class HomePage extends StatefulWidget {
@@ -20,8 +20,8 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _paginas = [
     const ExplorarPage(),
     const PesquisaPage(),
-    const LendoPage(),
-    const PerfilPage(),
+    const BibliotecaPage(),
+    const PerfilPage(nomeUsuario: ' Isadora Miranda', avatarUrl: '',),
   ];
 
   void _onItemTapped(int index) {
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: MyColors.creme,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.white,
+        selectedItemColor:  MyColors.abobora,
         unselectedItemColor: MyColors.marromClaro,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.menu_book),
-            label: "Lendo",
+            label: "Biblioteca",
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
