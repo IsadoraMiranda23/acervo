@@ -2,7 +2,7 @@ import 'package:acervo/my_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:acervo/pages/explorar.page.dart';
-import 'package:acervo/pages/pesquisa.page.dart';  // Crie depois
+import 'package:acervo/pages/navegar.dart';  // Crie depois
 import 'package:acervo/pages/biblioteca.page.dart';     // Crie depois
 import 'package:acervo/pages/perfil.page.dart';    // Crie depois
 
@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _paginas = [
     const ExplorarPage(),
-    const PesquisaPage(),
+    const NavegarPage(),
     const BibliotecaPage(),
     const PerfilPage(nomeUsuario: ' Isadora Miranda', avatarUrl: '',),
   ];
@@ -74,8 +74,8 @@ class _HomePageState extends State<HomePage> {
             label: "Explorar",
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: "Pesquisa",
+            icon: Icon(Icons.explore),
+            label: "Navegar",
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.menu_book),
