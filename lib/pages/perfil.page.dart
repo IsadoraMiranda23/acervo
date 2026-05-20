@@ -1,7 +1,6 @@
 import 'package:acervo/components/card_atualizacao.component.dart';
 import 'package:acervo/components/carrossel.progresso.dart';
 import 'package:flutter/material.dart';
-import '../components/card_atualizacao.component.dart';
 import '../my_colors.dart';
 
 class PerfilPage extends StatefulWidget {
@@ -84,16 +83,16 @@ class _PerfilPageState extends State<PerfilPage> {
                 child: ClipOval(
                   child: widget.avatarUrl.isNotEmpty
                       ? Image.network(
-                    widget.avatarUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.person,
-                        size: 100,
-                        color: MyColors.abobora,
-                      );
-                    },
-                  )
+                          widget.avatarUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.person,
+                              size: 100,
+                              color: MyColors.abobora,
+                            );
+                          },
+                        )
                       : Icon(Icons.person, size: 100, color: MyColors.abobora),
                 ),
               ),
@@ -120,7 +119,10 @@ class _PerfilPageState extends State<PerfilPage> {
               Center(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 30),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -157,7 +159,10 @@ class _PerfilPageState extends State<PerfilPage> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 25,
+                        horizontal: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -204,7 +209,10 @@ class _PerfilPageState extends State<PerfilPage> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(left: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 25,
+                        horizontal: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -257,7 +265,10 @@ class _PerfilPageState extends State<PerfilPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   color: MyColors.abobora,
                   borderRadius: BorderRadius.circular(45),
@@ -332,10 +343,7 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 16),
 
-
-            CarrosselProgresso(
-              livros: _livrosEmAndamento,
-            ),
+            CarrosselProgresso(livros: _livrosEmAndamento),
 
             const SizedBox(height: 30),
 
@@ -347,10 +355,11 @@ class _PerfilPageState extends State<PerfilPage> {
               imagemUrl: "https://exemplo.com/capa.jpg",
               estaLendo: true,
               progressoPorcentagem: 65,
-              descricao: "Estou adorando esse livro! A mistura de humor com ficção científica é sensacional. Recomendo demais para quem gosta de uma leitura leve e criativa.",
+              descricao:
+                  "Estou adorando esse livro! A mistura de humor com ficção científica é sensacional. Recomendo demais para quem gosta de uma leitura leve e criativa.",
               dataAtualizacao: DateTime.now().subtract(const Duration(days: 2)),
               onTap: () {
-                print("Card clicado!");
+                debugPrint("Card clicado!");
               },
             ),
 
@@ -360,8 +369,11 @@ class _PerfilPageState extends State<PerfilPage> {
               imagemUrl: "https://exemplo.com/capa2.jpg",
               estaLendo: false,
               avaliacao: 4.5,
-              descricao: "Uma obra-prima! Terminei esse livro impactado. A crítica social é atemporal e assustadoramente atual. Leitura obrigatória para todos.",
-              dataAtualizacao: DateTime.now().subtract(const Duration(days: 15)),
+              descricao:
+                  "Uma obra-prima! Terminei esse livro impactado. A crítica social é atemporal e assustadoramente atual. Leitura obrigatória para todos.",
+              dataAtualizacao: DateTime.now().subtract(
+                const Duration(days: 15),
+              ),
             ),
 
             const SizedBox(height: 16),

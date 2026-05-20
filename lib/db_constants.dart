@@ -1,10 +1,20 @@
-// Gabarito completo do banco de dados (Tabelas e Colunas)
 class DbTables {
   static const String livros = 'Livros';
   static const String resenhas = 'Resenhas';
   static const String usuarios = 'Usuarios';
   static const String seguidores = 'Seguidores';
   static const String livrosLidos = 'Livros_Lidos';
+  // CORREÇÃO 1: Adicionado o "Db" no início para bater com o Supabase
+  static const String comentarios = 'DbComentarios';
+}
+
+class DbComentarios {
+  static const String idComentario = 'ID_Comentario';
+  // CORREÇÃO 2: Alterado para "r" minúsculo para bater com o Supabase
+  static const String idResenha = 'ID_resenha';
+  static const String idUsuario = 'ID_Usuario';
+  static const String texto = 'Texto';
+  static const String data = 'Data';
 }
 
 class DbUsuarios {
@@ -34,9 +44,10 @@ class DbResenhas {
   static const String idLivro = 'ID_Livro';
   static const String idUsuario = 'ID_Usuario';
   static const String comentario = 'Comentario';
-  static const String data = 'Data';
-  static const String avaliacaoResenha = 'Avalicao_Resenha';
+  static const String dataResenha = 'Data';
+  static const String avaliacaoResenha = 'Avaliacao_Resenha';
   static const String ritmo = 'Ritmo';
+  static const String idResenha = 'ID_resenha';
 }
 
 class DbSeguidores {

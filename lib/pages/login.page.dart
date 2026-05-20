@@ -42,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-
                   Text(
                     'Bem-vindo',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -59,8 +58,8 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'Retome sua jornada literária',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: MyColors.marromClaro,
-                      fontSize: 16
+                      color: MyColors.marromClaro,
+                      fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -83,18 +82,28 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       hintText: 'seu@email.com',
-                      prefixIcon: const Icon(Icons.email_outlined, color: MyColors.marrom),
+                      prefixIcon: const Icon(
+                        Icons.email_outlined,
+                        color: MyColors.marrom,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marromClaro),
+                        borderSide: const BorderSide(
+                          color: MyColors.marromClaro,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marromClaro),
+                        borderSide: const BorderSide(
+                          color: MyColors.marromClaro,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marrom, width: 2),
+                        borderSide: const BorderSide(
+                          color: MyColors.marrom,
+                          width: 2,
+                        ),
                       ),
                     ),
                     keyboardType: TextInputType.emailAddress,
@@ -118,18 +127,28 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       hintText: 'Digite sua senha',
-                      prefixIcon: const Icon(Icons.lock_outline, color: MyColors.marrom),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: MyColors.marrom,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marromClaro),
+                        borderSide: const BorderSide(
+                          color: MyColors.marromClaro,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marromClaro),
+                        borderSide: const BorderSide(
+                          color: MyColors.marromClaro,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: MyColors.marrom, width: 2),
+                        borderSide: const BorderSide(
+                          color: MyColors.marrom,
+                          width: 2,
+                        ),
                       ),
                     ),
                     obscureText: true,
@@ -137,16 +156,22 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 32),
 
-
-                 BotaoComponente(texto: "Entrar no Acervo", onPressed: (){context.push(HomePage.routeName);}, borderRadius: 46,corFundo: MyColors.abobora, iconeDepois: Icons.arrow_forward,),
+                  BotaoComponente(
+                    texto: "Entrar no Acervo",
+                    onPressed: () {
+                      context.push(HomePage.routeName);
+                    },
+                    borderRadius: 46,
+                    corFundo: MyColors.abobora,
+                    iconeDepois: Icons.arrow_forward,
+                  ),
 
                   const SizedBox(height: 16),
-
 
                   TextButton(
                     onPressed: () {
                       context.push(CadastroPage.routeName);
-                     print("botão clicado");
+                      debugPrint("botão clicado");
                     },
                     child: Text(
                       'Não tem uma conta? Cadastre-se',
