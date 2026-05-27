@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../db_constants.dart';
 import '../my_colors.dart';
 import 'login.page.dart';
 
@@ -22,25 +24,109 @@ class _CadastroPageState extends State<CadastroPage> {
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
 
-  void _handleCadastro() {
+  // Validação de e-mail mais robusta
+  bool _isValidEmail(String email) {
+    // Regex mais completo para validação de e-mail
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  Future<void> _handleCadastro() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
 
-      // TODO:mImplementar lógica de cadastro
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        final supabase = Supabase.instance.client;
+
+        final email = _emailController.text.trim().toLowerCase();
+        final password = _senhaController.text;
+
+        // Verificação adicional do e-mail
+        if (!_isValidEmail(email)) {
+          throw Exception('Por favor, insira um e-mail válido (ex: nome@dominio.com)');
+        }
+
+        // 1. Criar usuário no Auth do Supabase
+        final authResponse = await supabase.auth.signUp(
+          email: email,
+          password: password,
+        );
+
+        if (authResponse.user == null) {
+          throw Exception('Erro ao criar usuário');
+        }
+
+        // 2. Inserir dados do usuário na tabela Usuarios
+        final userId = authResponse.user!.id;
+
+        // Gerar username a partir do nome completo
+        String username = _nomeCompletoController.text.trim().toLowerCase().replaceAll(' ', '.');
+        // Remover caracteres especiais do username
+        username = username.replaceAll(RegExp(r'[^a-zA-Z0-9.]'), '');
+        // Adicionar números aleatórios para garantir unicidade
+        username = '$username${DateTime.now().millisecondsSinceEpoch % 10000}';
+
+        await supabase.from(DbTables.usuarios).insert({
+          DbUsuarios.id: userId,
+          DbUsuarios.nome: _nomeCompletoController.text.trim(),
+          DbUsuarios.username: username,
+          DbUsuarios.email: email,
+          DbUsuarios.avatarUrl: null,
+          DbUsuarios.dataNascimento: null,
+          DbUsuarios.bio: null,
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 4),
+            ),
+          );
+
+          // Navegar para a página de login
+          context.go(LoginPage.routeName);
+        }
+      } catch (e) {
+        print('Erro no cadastro: $e');
+
+        String errorMessage = 'Erro ao realizar cadastro. Tente novamente.';
+
+        if (e is AuthException) {
+          if (e.message.contains('already registered')) {
+            errorMessage = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.';
+          } else if (e.message.contains('password')) {
+            errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+          } else if (e.message.contains('email_address_invalid')) {
+            errorMessage = 'E-mail inválido. Use um formato como: nome@exemplo.com';
+          } else if (e.message.contains('Invalid email')) {
+            errorMessage = 'E-mail inválido. Verifique o formato do seu e-mail.';
+          }
+        } else if (e.toString().contains('e-mail válido')) {
+          errorMessage = e.toString().replaceFirst('Exception: ', '');
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      } finally {
         if (mounted) {
           setState(() {
             _isLoading = false;
           });
-
-          context.go(LoginPage.routeName);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Cadastro realizado com sucesso!')),
-          );
         }
-      });
+      }
     }
   }
 
@@ -112,7 +198,6 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 8),
 
-
                     Text(
                       "Junte-se à nossa comunidade de leitores e organize sua jornada literária.",
                       textAlign: TextAlign.center,
@@ -124,6 +209,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 32),
 
+                    // Campo Nome completo
                     TextFormField(
                       controller: _nomeCompletoController,
                       decoration: InputDecoration(
@@ -152,17 +238,21 @@ class _CadastroPageState extends State<CadastroPage> {
                         if (value.trim().split(' ').length < 2) {
                           return 'Insira seu nome e sobrenome';
                         }
+                        if (value.length < 3) {
+                          return 'Nome muito curto';
+                        }
                         return null;
                       },
                     ),
                     const SizedBox(height: 16),
 
-                    // Campo Email
+                    // Campo E-mail com validação rigorosa
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: 'E-mail',
+                        hintText: 'exemplo@dominio.com',
                         labelStyle: TextStyle(color: MyColors.marrom),
                         prefixIcon: Icon(Icons.email_outlined, color: MyColors.abobora),
                         border: OutlineInputBorder(
@@ -184,19 +274,21 @@ class _CadastroPageState extends State<CadastroPage> {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira seu e-mail';
                         }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'Insira um e-mail válido';
+                        if (!_isValidEmail(value)) {
+                          return 'Insira um e-mail válido (ex: nome@email.com)';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 16),
 
+                    // Campo Senha
                     TextFormField(
                       controller: _senhaController,
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
                         labelText: 'Senha',
+                        hintText: 'Mínimo 6 caracteres',
                         labelStyle: TextStyle(color: MyColors.marrom),
                         prefixIcon: Icon(Icons.lock_outline, color: MyColors.abobora),
                         suffixIcon: IconButton(
@@ -237,6 +329,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Campo Confirmar Senha
                     TextFormField(
                       controller: _confirmarSenhaController,
                       obscureText: !_isConfirmPasswordVisible,
@@ -282,6 +375,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 32),
 
+                    // Botão Cadastrar
                     ElevatedButton(
                       onPressed: _isLoading ? null : _handleCadastro,
                       style: ElevatedButton.styleFrom(
@@ -312,6 +406,7 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 24),
 
+                    // Link para login
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

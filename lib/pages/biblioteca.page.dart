@@ -6,7 +6,7 @@ class LivroBiblioteca {
   final String titulo;
   final String autor;
   final String? capaUrl;
-  final String status;
+  late final String status;
   late final bool isFavorito;
 
   LivroBiblioteca({
@@ -247,10 +247,10 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                 : GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 2 colunas para cards maiores e mais bonitos
+                crossAxisCount: 2,
                 childAspectRatio: 0.68,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 20,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 16,
               ),
               itemCount: _livrosFiltrados.length,
               itemBuilder: (context, index) {
@@ -307,12 +307,12 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -320,29 +320,29 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Capa do livro com efeito de sombra
+            // Capa do livro
             ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
               child: Stack(
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 180,
+                    height: 130,
                     color: MyColors.creme,
                     child: livro.capaUrl != null && livro.capaUrl!.isNotEmpty
                         ? Image.network(
                       livro.capaUrl!,
                       width: double.infinity,
-                      height: 180,
+                      height: 130,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         color: MyColors.creme,
                         child: Icon(
                           Icons.book,
-                          size: 60,
+                          size: 40,
                           color: MyColors.abobora.withAlpha(100),
                         ),
                       ),
@@ -351,20 +351,20 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                       color: MyColors.creme,
                       child: Icon(
                         Icons.book,
-                        size: 60,
+                        size: 40,
                         color: MyColors.abobora.withAlpha(100),
                       ),
                     ),
                   ),
-                  // Badge de status no canto superior direito
+                  // Badge de status
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: _getStatusColor(livro.status),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withAlpha(30),
@@ -375,7 +375,7 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                       child: Text(
                         _getStatusTexto(livro.status),
                         style: const TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -385,10 +385,9 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                 ],
               ),
             ),
-
             // Informações do livro
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -396,21 +395,21 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                   Text(
                     livro.titulo,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'PlayfairDisplay',
                       color: MyColors.preto,
-                      height: 1.3,
+                      height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Icon(
                         Icons.person_outline,
-                        size: 12,
+                        size: 10,
                         color: MyColors.marromClaro,
                       ),
                       const SizedBox(width: 4),
@@ -418,7 +417,7 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                         child: Text(
                           livro.autor,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 9,
                             color: MyColors.marromClaro,
                             fontWeight: FontWeight.w500,
                           ),
@@ -428,41 +427,97 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  // Barra de progresso para livros em leitura
-                  if (livro.status == 'lendo') ...[
-                    Container(
-                      height: 3,
+                  const SizedBox(height: 4),
+                  // Status clickável
+                  GestureDetector(
+                    onTap: () {
+                      _mostrarMenuStatus(livro);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       decoration: BoxDecoration(
-                        color: MyColors.marromClaro.withAlpha(30),
-                        borderRadius: BorderRadius.circular(2),
+                        color: _getStatusColor(livro.status).withAlpha(20),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: FractionallySizedBox(
-                        widthFactor: 0.65, // Progresso exemplo
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.abobora,
-                            borderRadius: BorderRadius.circular(2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getStatusTexto(livro.status),
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                              color: _getStatusColor(livro.status),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.edit,
+                            size: 8,
+                            color: _getStatusColor(livro.status),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '65% concluído',
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: MyColors.abobora,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _mostrarMenuStatus(LivroBiblioteca livro) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Alterar Status',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildStatusOption(livro, 'Lendo', 'lendo'),
+              _buildStatusOption(livro, 'Lido', 'lido'),
+              _buildStatusOption(livro, 'Quero Ler', 'queroLer'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusOption(LivroBiblioteca livro, String label, String statusValue) {
+    return ListTile(
+      leading: Icon(
+        statusValue == 'lendo' ? Icons.menu_book :
+        statusValue == 'lido' ? Icons.check_circle :
+        Icons.bookmark_border,
+        color: _getStatusColor(statusValue),
+      ),
+      title: Text(label),
+      trailing: livro.status == statusValue
+          ? const Icon(Icons.check, color: Colors.green)
+          : null,
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {
+          livro.status = statusValue;
+          _aplicarFiltro();
+        });
+      },
     );
   }
 
