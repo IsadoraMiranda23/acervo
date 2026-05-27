@@ -1,8 +1,10 @@
 import 'package:acervo/components/card_atualizacao.component.dart';
 import 'package:acervo/components/carrossel.progresso.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../components/card_atualizacao.component.dart';
 import '../my_colors.dart';
+import 'biblioteca.page.dart';
 
 class PerfilPage extends StatefulWidget {
   final String nomeUsuario;
@@ -21,6 +23,7 @@ class PerfilPage extends StatefulWidget {
     this.diasSeguidos = 0,
     this.bio,
   });
+  static const routeName = '/perfil';
 
   @override
   State<PerfilPage> createState() => _PerfilPageState();
@@ -307,12 +310,12 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 40),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "Leituras atuais",
@@ -325,7 +328,12 @@ class _PerfilPageState extends State<PerfilPage> {
                       ),
                     ),
                   ),
-                  InkWell(child: Text("Ver tudo ")),
+                  InkWell(
+                    onTap: () {
+                      context.push(BibliotecaPage.routeName);
+                    },
+                    child: const Text("Ver tudo "),
+                  ),
                 ],
               ),
             ),
