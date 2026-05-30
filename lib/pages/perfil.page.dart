@@ -1,33 +1,39 @@
+import 'dart:io';
 import 'package:acervo/components/card_atualizacao.component.dart';
 import 'package:acervo/components/carrossel.progresso.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:acervo/services/auth_service.dart';
+import 'package:acervo/services/upload_service.dart';
 import '../my_colors.dart';
+import 'biblioteca.page.dart';
 
 class PerfilPage extends StatefulWidget {
-  final String nomeUsuario;
-  final String avatarUrl;
-  final int livrosLidos;
-  final int paginasLidas;
-  final int diasSeguidos;
-  final String? bio;
-
   const PerfilPage({
     super.key,
-    required this.nomeUsuario,
-    this.avatarUrl = '',
-    this.livrosLidos = 0,
-    this.paginasLidas = 0,
-    this.diasSeguidos = 0,
-    this.bio,
+    required String nomeUsuario,
+    required String avatarUrl,
   });
+  static const routeName = '/perfil';
 
   @override
   State<PerfilPage> createState() => _PerfilPageState();
 }
 
 class _PerfilPageState extends State<PerfilPage> {
-  // Dados de exemplo para os livros em andamento
-  // Depois você pode buscar esses dados do Supabase
+  final AuthService _auth = AuthService();
+  final UploadService _upload = UploadService();
+
+  String _nomeUsuario = '';
+  String _avatarUrl = '';
+  String _bio = '';
+  int _livrosLidos = 0;
+  int _paginasLidas = 0;
+  int _diasSeguidos = 0;
+  bool _isLoading = true;
+  bool _isUploading = false;
+
   final List<Map<String, dynamic>> _livrosEmAndamento = [
     {
       'nomeLivro': 'O Guia do Mochileiro das Galáxias',
@@ -53,7 +59,230 @@ class _PerfilPageState extends State<PerfilPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _carregarDadosPerfil();
+  }
+
+  Future<void> _carregarDadosPerfil() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = _auth.currentUserId;
+
+      print('Carregando perfil para userId: $userId');
+
+      if (userId != null) {
+        final response = await supabase
+            .from('Usuarios')
+            .select()
+            .eq('ID_Usuario', userId);
+
+        print('Resposta: ${response.length} registros');
+
+        if (response.isNotEmpty) {
+          final userData = response[0];
+          setState(() {
+            _nomeUsuario =
+                userData['Nome'] ??
+                _auth.currentUserEmail?.split('@').first ??
+                'Usuário';
+            _avatarUrl = userData['Avatar_URL'] ?? '';
+            _bio = userData['Bio'] ?? '';
+          });
+          print(
+            'Dados carregados: nome=$_nomeUsuario, avatar=${_avatarUrl.isNotEmpty}',
+          );
+        } else {
+          print('Usuário não encontrado na tabela');
+          setState(() {
+            _nomeUsuario =
+                _auth.currentUserEmail?.split('@').first ?? 'Usuário';
+          });
+        }
+      }
+
+      _livrosLidos = 12;
+      _paginasLidas = 3450;
+      _diasSeguidos = 15;
+    } catch (e) {
+      print('Erro ao carregar perfil: $e');
+      setState(() {
+        _nomeUsuario = _auth.currentUserEmail?.split('@').first ?? 'Usuário';
+        _avatarUrl = '';
+        _bio = '';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _escolherImagem() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Foto de perfil',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: MyColors.abobora,
+                ),
+                title: const Text('Escolher da galeria'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final image = await _upload.pickImageFromGallery();
+                  if (image != null) {
+                    await _fazerUploadImagem(image);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: MyColors.abobora),
+                title: const Text('Tirar foto'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final image = await _upload.pickImageFromCamera();
+                  if (image != null) {
+                    await _fazerUploadImagem(image);
+                  }
+                },
+              ),
+              if (_avatarUrl.isNotEmpty)
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text('Remover foto'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _removerFoto();
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _fazerUploadImagem(File imageFile) async {
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final userId = _auth.currentUserId;
+      if (userId == null) return;
+
+      final imageUrl = await _upload.uploadProfileImage(imageFile, userId);
+
+      if (imageUrl != null) {
+        final supabase = Supabase.instance.client;
+        await supabase
+            .from('Usuarios')
+            .update({'Avatar_URL': imageUrl})
+            .eq('ID_Usuario', userId);
+
+        setState(() {
+          _avatarUrl = imageUrl;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Foto atualizada com sucesso!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        throw Exception('Falha no upload');
+      }
+    } catch (e) {
+      print('Erro ao fazer upload: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao atualizar foto'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+  Future<void> _removerFoto() async {
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final userId = _auth.currentUserId;
+      if (userId == null) return;
+
+      final supabase = Supabase.instance.client;
+      await supabase
+          .from('Usuarios')
+          .update({'Avatar_URL': null})
+          .eq('ID_Usuario', userId);
+
+      setState(() {
+        _avatarUrl = '';
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Foto removida com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Erro ao remover foto: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao remover foto'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: MyColors.creme,
+        body: Center(child: CircularProgressIndicator(color: MyColors.abobora)),
+      );
+    }
+
     return Container(
       color: MyColors.creme,
       child: SingleChildScrollView(
@@ -64,36 +293,100 @@ class _PerfilPageState extends State<PerfilPage> {
             const SizedBox(height: 30),
 
             // Avatar
+            // No método build, substitua a seção do Avatar por esta:
+
+            // Avatar com botão de editar
             Center(
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: MyColors.creme,
-                  border: Border.all(color: MyColors.abobora, width: 4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(30),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
+              child: GestureDetector(
+                onTap: _isUploading ? null : _escolherImagem,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Foto de perfil
+                    Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MyColors.creme,
+                        border: Border.all(color: MyColors.abobora, width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(30),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: _avatarUrl.isNotEmpty
+                            ? Image.network(
+                                _avatarUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: MyColors.abobora,
+                                  );
+                                },
+                              )
+                            : Icon(
+                                Icons.person,
+                                size: 100,
+                                color: MyColors.abobora,
+                              ),
+                      ),
                     ),
+
+                    // Overlay escuro quando passa o mouse (opcional)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black.withAlpha(_isUploading ? 150 : 0),
+                        ),
+                      ),
+                    ),
+
+                    // Ícone de câmera para editar
+                    if (!_isUploading)
+                      Positioned(
+                        bottom: 5,
+                        right: 5,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: MyColors.abobora,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(50),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 24,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+
+                    // Loading indicator
+                    if (_isUploading)
+                      const Positioned.fill(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        ),
+                      ),
                   ],
-                ),
-                child: ClipOval(
-                  child: widget.avatarUrl.isNotEmpty
-                      ? Image.network(
-                          widget.avatarUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.person,
-                              size: 100,
-                              color: MyColors.abobora,
-                            );
-                          },
-                        )
-                      : Icon(Icons.person, size: 100, color: MyColors.abobora),
                 ),
               ),
             ),
@@ -103,7 +396,7 @@ class _PerfilPageState extends State<PerfilPage> {
             // Nome do usuário
             Center(
               child: Text(
-                widget.nomeUsuario,
+                _nomeUsuario,
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -114,8 +407,8 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 12),
 
-            // Bio do usuário (só mostra se tiver bio)
-            if (widget.bio != null && widget.bio!.isNotEmpty)
+            // Bio do usuário
+            if (_bio.isNotEmpty)
               Center(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 30),
@@ -135,7 +428,7 @@ class _PerfilPageState extends State<PerfilPage> {
                     ],
                   ),
                   child: Text(
-                    widget.bio!,
+                    _bio,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -155,7 +448,6 @@ class _PerfilPageState extends State<PerfilPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Card Livros Lidos
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 12),
@@ -183,7 +475,7 @@ class _PerfilPageState extends State<PerfilPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            widget.livrosLidos.toString(),
+                            _livrosLidos.toString(),
                             style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -204,8 +496,6 @@ class _PerfilPageState extends State<PerfilPage> {
                       ),
                     ),
                   ),
-
-                  // Card Páginas Lidas
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(left: 12),
@@ -233,7 +523,7 @@ class _PerfilPageState extends State<PerfilPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            widget.paginasLidas.toString(),
+                            _paginasLidas.toString(),
                             style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -260,7 +550,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 25),
 
-            // Card Dias Seguidos
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -293,7 +582,7 @@ class _PerfilPageState extends State<PerfilPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.diasSeguidos.toString(),
+                          _diasSeguidos.toString(),
                           style: const TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
@@ -318,12 +607,12 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 40),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "Leituras atuais",
@@ -336,7 +625,12 @@ class _PerfilPageState extends State<PerfilPage> {
                       ),
                     ),
                   ),
-                  InkWell(child: Text("Ver tudo ")),
+                  InkWell(
+                    onTap: () {
+                      context.push(BibliotecaPage.routeName);
+                    },
+                    child: const Text("Ver tudo "),
+                  ),
                 ],
               ),
             ),
@@ -347,7 +641,7 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 30),
 
-            Text("Atualizações recentes"),
+            const Text("Atualizações recentes"),
 
             CardAtualizacaoComponent(
               nomeLivro: "O Guia do Mochileiro das Galáxias",

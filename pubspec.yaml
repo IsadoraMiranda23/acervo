@@ -16,6 +16,8 @@ dependencies:
   flutter_dotenv: ^6.0.0
   http: ^1.6.0
   linear_progress_bar: ^3.0.0
+  image_picker: ^1.0.7
+
 
 dev_dependencies:
   flutter_test:

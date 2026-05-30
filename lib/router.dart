@@ -1,5 +1,6 @@
 import 'package:acervo/pages/biblioteca.page.dart';
 import 'package:acervo/pages/cadastro.page.dart';
+import 'package:acervo/pages/info_livro.page.dart';
 import 'package:acervo/pages/login.page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +21,11 @@ final router = GoRouter(
       path: CadastroPage.routeName,
       name: CadastroPage.routeName,
       pageBuilder: (contex, state) => NoTransitionPage(child: CadastroPage()),
+    ),
+    GoRoute(
+      path: InfoLivroPage.routeName,
+      name: InfoLivroPage.routeName,
+      pageBuilder: (contex, state) => NoTransitionPage(child: InfoLivroPage()),
     ),
 
     GoRoute(
