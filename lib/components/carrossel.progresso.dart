@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:acervo/components/progresso_livro.component.dart';
-import 'package:acervo/my_colors.dart';
 
 class CarrosselProgresso extends StatelessWidget {
   final List<Map<String, dynamic>> livros;
 
-  const CarrosselProgresso({
-    super.key,
-    required this.livros,
-  });
+  const CarrosselProgresso({super.key, required this.livros});
 
   @override
   Widget build(BuildContext context) {

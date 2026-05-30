@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:acervo/components/card_indicacao_book.component.dart';
 import 'package:acervo/components/carrossel.dart';
 import 'package:flutter/material.dart';
 import 'package:acervo/my_colors.dart';
@@ -21,10 +20,14 @@ class _ExplorarPageState extends State<ExplorarPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _carregando = true;
+
   List<Map<String, dynamic>> _livrosCarrossel = [];
   Timer? _debounce;
   bool _pesquisando = false;
   List<Map<String, dynamic>> _resultadosPesquisa = [];
+
+  List<Map<String, dynamic>> _ultimasResenhas = [];
+  bool _carregandoResenhas = true;
 
   @override
   void dispose() {
@@ -37,6 +40,40 @@ class _ExplorarPageState extends State<ExplorarPage> {
   void initState() {
     super.initState();
     _buscarLivrosParaCarrossel();
+    _buscarUltimasResenhas();
+  }
+
+  Future<void> _buscarUltimasResenhas() async {
+    try {
+      final resposta = await Supabase.instance.client
+          .from(DbTables.resenhas)
+          .select('''
+            *,
+            ${DbTables.usuarios} ( ${DbUsuarios.nome}, ${DbUsuarios.avatarUrl} ),
+            ${DbTables.livros} ( ${DbLivros.titulo}, ${DbLivros.autor}, ${DbLivros.capaUrl} )
+          ''')
+          .order(
+            DbResenhas.dataResenha,
+            ascending: false,
+          ) // Traz as mais recentes primeiro
+          .limit(10); // Limita para não pesar a memória do celular
+
+      // Se o widget ainda estiver na tela quando o dado chegar, atualiza a UI
+      if (mounted) {
+        setState(() {
+          _ultimasResenhas = List<Map<String, dynamic>>.from(resposta);
+          _carregandoResenhas = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Erro ao buscar resenhas: $e');
+      // Mesmo dando erro, precisamos parar de mostrar a bolinha girando
+      if (mounted) {
+        setState(() {
+          _carregandoResenhas = false;
+        });
+      }
+    }
   }
 
   Future<void> _buscarLivrosParaCarrossel() async {
@@ -57,7 +94,8 @@ class _ExplorarPageState extends State<ExplorarPage> {
           urlCapa = urlCapa.replaceFirst('http://', 'https://');
         }
         if (urlCapa.isNotEmpty) {
-          urlCapa = 'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
+          urlCapa =
+              'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
         }
 
         return {
@@ -74,7 +112,7 @@ class _ExplorarPageState extends State<ExplorarPage> {
         });
       }
     } catch (e) {
-      print('Erro no Carrossel: $e');
+      debugPrint('Erro no Carrossel: $e');
       if (mounted) setState(() => _carregando = false);
     }
   }
@@ -94,7 +132,7 @@ class _ExplorarPageState extends State<ExplorarPage> {
           .ilike(DbLivros.titulo, '%$buscaLimpa%');
 
       if (respostaSupabase.isNotEmpty) {
-        print('Encontrado no Supabase! Ignorando o Google.');
+        debugPrint('Encontrado no Supabase! Ignorando o Google.');
 
         final resultadosLocais = respostaSupabase.map((livro) {
           String urlCapa = livro[DbLivros.capaUrl] ?? '';
@@ -104,7 +142,8 @@ class _ExplorarPageState extends State<ExplorarPage> {
           }
 
           if (urlCapa.isNotEmpty) {
-            urlCapa = 'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
+            urlCapa =
+                'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
           }
 
           return {
@@ -124,7 +163,7 @@ class _ExplorarPageState extends State<ExplorarPage> {
         return;
       }
 
-      print('Não achou no Supabase. Buscando no Google Books...');
+      debugPrint('Não achou no Supabase. Buscando no Google Books...');
       final apiKey = dotenv.env['GOOGLE_BOOKS_API_KEY'] ?? 'API não encontrada';
 
       final url = Uri.https('www.googleapis.com', '/books/v1/volumes', {
@@ -148,8 +187,9 @@ class _ExplorarPageState extends State<ExplorarPage> {
           }
 
           if (urlCapa.isNotEmpty) {
-            urlCapa = 'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
-            print('URL da Capa Gerada: $urlCapa');
+            urlCapa =
+                'https://api.allorigins.win/raw?url=${Uri.encodeComponent(urlCapa)}';
+            debugPrint('URL da Capa Gerada: $urlCapa');
           }
 
           final autores = volumeInfo['authors'] as List<dynamic>?;
@@ -171,10 +211,10 @@ class _ExplorarPageState extends State<ExplorarPage> {
           });
         }
       } else {
-        print('Erro no Google: ${response.statusCode}');
+        debugPrint('Erro no Google: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erro na pesquisa híbrida: $e');
+      debugPrint('Erro na pesquisa híbrida: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -233,15 +273,15 @@ class _ExplorarPageState extends State<ExplorarPage> {
                     prefixIcon: Icon(Icons.search, color: MyColors.abobora),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                      icon: Icon(Icons.clear, color: Colors.grey[400]),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {
-                          _searchQuery = '';
-                          _resultadosPesquisa.clear();
-                        });
-                      },
-                    )
+                            icon: Icon(Icons.clear, color: Colors.grey[400]),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchQuery = '';
+                                _resultadosPesquisa.clear();
+                              });
+                            },
+                          )
                         : null,
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -290,10 +330,7 @@ class _ExplorarPageState extends State<ExplorarPage> {
                   ),
                 ),
               ),
-              const Text(
-                "ver mais..",
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text("ver mais..", style: TextStyle(fontSize: 16)),
             ],
           ),
         ),
@@ -302,13 +339,11 @@ class _ExplorarPageState extends State<ExplorarPage> {
           padding: const EdgeInsets.all(6.0),
           child: _carregando
               ? const SizedBox(
-            height: 380,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: MyColors.abobora,
-              ),
-            ),
-          )
+                  height: 380,
+                  child: Center(
+                    child: CircularProgressIndicator(color: MyColors.abobora),
+                  ),
+                )
               : Carrossel(livros: _livrosCarrossel),
         ),
         const SizedBox(height: 20),
@@ -328,24 +363,85 @@ class _ExplorarPageState extends State<ExplorarPage> {
             ),
           ),
         ),
-        CardResenhaUsuarioComponent(
-          nomeUsuario: "Ana Silva",
-          avatarUrl: "",
-          tituloLivro: "O Guia do Mochileiro das Galáxias",
-          autorLivro: "Douglas Adams",
-          resenha: "Uma leitura incrível! Este livro mudou completamente minha visão sobre ficção científica. A forma como Douglas Adams mistura humor com conceitos filosóficos profundos é simplesmente genial. Recomendo para todos que procuram uma leitura leve mas que faz pensar. Os personagens são cativantes e a história nunca perde o ritmo. Sem dúvidas um dos melhores livros que li no ano! Mal posso esperar para ler os próximos da série.",
-          avaliacao: 4.5,
-          dataResenha: DateTime.now().subtract(const Duration(days: 2)),
-          onLike: () {
-            print("Curtiu!");
-          },
-          onComentar: () {
-            print("Comentar");
-          },
-          onCompartilhar: () {
-            print("Compartilhar");
-          },
-        ),
+        // Renderização Dinâmica das Últimas Críticas
+        _carregandoResenhas
+            ? const Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(color: MyColors.abobora),
+              )
+            : _ultimasResenhas.isEmpty
+            ? const Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text(
+                  'Nenhuma crítica recente encontrada.',
+                  style: TextStyle(color: MyColors.marromClaro),
+                ),
+              )
+            : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _ultimasResenhas
+                    .length, // Garantindo que o itemCount seja baseado na lista real de resenhas
+                itemBuilder: (context, index) {
+                  final resenha = _ultimasResenhas[index];
+
+                  final usuario = resenha[DbTables.usuarios] ?? {};
+                  final livro = resenha[DbTables.livros] ?? {};
+
+                  // Variáveis blindadas para evitar crashes por dados quebrados
+                  DateTime dataSegura = DateTime.now();
+
+                  try {
+                    String dataBruta = resenha[DbResenhas.dataResenha]
+                        .toString();
+
+                    // O Flutter confere se tem a barra. Se tiver, ele fatia e inverte.
+                    if (dataBruta.contains('/')) {
+                      List<String> partes = dataBruta.split('/');
+                      if (partes.length >= 3) {
+                        String dia = partes[0];
+                        String mes = partes[1];
+                        String ano = partes[2];
+
+                        // Monta no padrão ISO: Ano-Mês-Dia (Opcional: adiciona tempo 00:00:00)
+                        String dataConvertida = "$ano-$mes-$dia";
+                        dataSegura = DateTime.parse(dataConvertida);
+                      }
+                    } else {
+                      // Se por acaso já vier no formato certo
+                      dataSegura = DateTime.parse(dataBruta);
+                    }
+                  } catch (e) {
+                    debugPrint("Erro na conversão de data da resenha: $e");
+                  }
+
+                  double avaliacaoSegura = 0.0;
+                  try {
+                    // Se o banco mandar a nota como '4.5' em texto, ele converte em numero com segurança
+                    avaliacaoSegura = double.parse(
+                      resenha[DbResenhas.avaliacaoResenha].toString(),
+                    );
+                  } catch (e) {
+                    avaliacaoSegura = 0.0;
+                  }
+
+                  return CardResenhaUsuarioComponent(
+                    idResenha: resenha[DbResenhas.idResenha] ?? 0,
+                    nomeUsuario:
+                        usuario[DbUsuarios.nome] ?? 'Usuário Desconhecido',
+                    avatarUrl: usuario[DbUsuarios.avatarUrl] ?? '',
+                    tituloLivro: livro[DbLivros.titulo] ?? 'Livro Desconhecido',
+                    autorLivro: livro[DbLivros.autor] ?? '',
+                    resenha: resenha[DbResenhas.comentario] ?? '',
+                    avaliacao: avaliacaoSegura,
+                    dataResenha: dataSegura,
+                    // Usando a variável blindada
+                    onLike: () {
+                      debugPrint("Curtiu a resenha!");
+                    },
+                  );
+                },
+              ),
         const SizedBox(height: 30), // Espaço no final
       ],
     );
@@ -365,14 +461,13 @@ class _ExplorarPageState extends State<ExplorarPage> {
     if (_resultadosPesquisa.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(32.0),
-        child: Center(
-          child: Text('Nenhum livro encontrado.'),
-        ),
+        child: Center(child: Text('Nenhum livro encontrado.')),
       );
     }
 
     return ListView.builder(
-      shrinkWrap: true,  // Importante para funcionar dentro do SingleChildScrollView
+      shrinkWrap:
+          true, // Importante para funcionar dentro do SingleChildScrollView
       physics: const NeverScrollableScrollPhysics(), // Desativa scroll interno
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: _resultadosPesquisa.length,
@@ -396,11 +491,11 @@ class _ExplorarPageState extends State<ExplorarPage> {
               clipBehavior: Clip.antiAlias,
               child: livro['imagemUrl'].toString().isNotEmpty
                   ? Image.network(
-                livro['imagemUrl'],
-                fit: BoxFit.cover,
-                errorBuilder: (c, e, s) =>
-                const Icon(Icons.book, color: MyColors.abobora),
-              )
+                      livro['imagemUrl'],
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, e, s) =>
+                          const Icon(Icons.book, color: MyColors.abobora),
+                    )
                   : const Icon(Icons.book, color: MyColors.abobora),
             ),
             title: Text(

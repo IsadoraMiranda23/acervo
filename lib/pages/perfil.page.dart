@@ -10,7 +10,11 @@ import '../my_colors.dart';
 import 'biblioteca.page.dart';
 
 class PerfilPage extends StatefulWidget {
-  const PerfilPage({super.key, required String nomeUsuario, required String avatarUrl});
+  const PerfilPage({
+    super.key,
+    required String nomeUsuario,
+    required String avatarUrl,
+  });
   static const routeName = '/perfil';
 
   @override
@@ -82,15 +86,21 @@ class _PerfilPageState extends State<PerfilPage> {
         if (response.isNotEmpty) {
           final userData = response[0];
           setState(() {
-            _nomeUsuario = userData['Nome'] ?? _auth.currentUserEmail?.split('@').first ?? 'Usuário';
+            _nomeUsuario =
+                userData['Nome'] ??
+                _auth.currentUserEmail?.split('@').first ??
+                'Usuário';
             _avatarUrl = userData['Avatar_URL'] ?? '';
             _bio = userData['Bio'] ?? '';
           });
-          print('Dados carregados: nome=$_nomeUsuario, avatar=${_avatarUrl.isNotEmpty}');
+          print(
+            'Dados carregados: nome=$_nomeUsuario, avatar=${_avatarUrl.isNotEmpty}',
+          );
         } else {
           print('Usuário não encontrado na tabela');
           setState(() {
-            _nomeUsuario = _auth.currentUserEmail?.split('@').first ?? 'Usuário';
+            _nomeUsuario =
+                _auth.currentUserEmail?.split('@').first ?? 'Usuário';
           });
         }
       }
@@ -98,7 +108,6 @@ class _PerfilPageState extends State<PerfilPage> {
       _livrosLidos = 12;
       _paginasLidas = 3450;
       _diasSeguidos = 15;
-
     } catch (e) {
       print('Erro ao carregar perfil: $e');
       setState(() {
@@ -127,14 +136,14 @@ class _PerfilPageState extends State<PerfilPage> {
             children: [
               const Text(
                 'Foto de perfil',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ListTile(
-                leading: const Icon(Icons.photo_library, color: MyColors.abobora),
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: MyColors.abobora,
+                ),
                 title: const Text('Escolher da galeria'),
                 onTap: () async {
                   Navigator.pop(context);
@@ -270,9 +279,7 @@ class _PerfilPageState extends State<PerfilPage> {
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: MyColors.creme,
-        body: Center(
-          child: CircularProgressIndicator(color: MyColors.abobora),
-        ),
+        body: Center(child: CircularProgressIndicator(color: MyColors.abobora)),
       );
     }
 
@@ -288,7 +295,7 @@ class _PerfilPageState extends State<PerfilPage> {
             // Avatar
             // No método build, substitua a seção do Avatar por esta:
 
-// Avatar com botão de editar
+            // Avatar com botão de editar
             Center(
               child: GestureDetector(
                 onTap: _isUploading ? null : _escolherImagem,
@@ -314,17 +321,21 @@ class _PerfilPageState extends State<PerfilPage> {
                       child: ClipOval(
                         child: _avatarUrl.isNotEmpty
                             ? Image.network(
-                          _avatarUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.person,
-                              size: 100,
-                              color: MyColors.abobora,
-                            );
-                          },
-                        )
-                            : Icon(Icons.person, size: 100, color: MyColors.abobora),
+                                _avatarUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: MyColors.abobora,
+                                  );
+                                },
+                              )
+                            : Icon(
+                                Icons.person,
+                                size: 100,
+                                color: MyColors.abobora,
+                              ),
                       ),
                     ),
 
@@ -401,7 +412,10 @@ class _PerfilPageState extends State<PerfilPage> {
               Center(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 30),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -437,7 +451,10 @@ class _PerfilPageState extends State<PerfilPage> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 25,
+                        horizontal: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -482,7 +499,10 @@ class _PerfilPageState extends State<PerfilPage> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(left: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 25,
+                        horizontal: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -534,7 +554,10 @@ class _PerfilPageState extends State<PerfilPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   color: MyColors.abobora,
                   borderRadius: BorderRadius.circular(45),
@@ -614,9 +637,7 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 16),
 
-            CarrosselProgresso(
-              livros: _livrosEmAndamento,
-            ),
+            CarrosselProgresso(livros: _livrosEmAndamento),
 
             const SizedBox(height: 30),
 
@@ -628,10 +649,11 @@ class _PerfilPageState extends State<PerfilPage> {
               imagemUrl: "https://exemplo.com/capa.jpg",
               estaLendo: true,
               progressoPorcentagem: 65,
-              descricao: "Estou adorando esse livro! A mistura de humor com ficção científica é sensacional. Recomendo demais para quem gosta de uma leitura leve e criativa.",
+              descricao:
+                  "Estou adorando esse livro! A mistura de humor com ficção científica é sensacional. Recomendo demais para quem gosta de uma leitura leve e criativa.",
               dataAtualizacao: DateTime.now().subtract(const Duration(days: 2)),
               onTap: () {
-                print("Card clicado!");
+                debugPrint("Card clicado!");
               },
             ),
 
@@ -641,8 +663,11 @@ class _PerfilPageState extends State<PerfilPage> {
               imagemUrl: "https://exemplo.com/capa2.jpg",
               estaLendo: false,
               avaliacao: 4.5,
-              descricao: "Uma obra-prima! Terminei esse livro impactado. A crítica social é atemporal e assustadoramente atual. Leitura obrigatória para todos.",
-              dataAtualizacao: DateTime.now().subtract(const Duration(days: 15)),
+              descricao:
+                  "Uma obra-prima! Terminei esse livro impactado. A crítica social é atemporal e assustadoramente atual. Leitura obrigatória para todos.",
+              dataAtualizacao: DateTime.now().subtract(
+                const Duration(days: 15),
+              ),
             ),
 
             const SizedBox(height: 16),

@@ -26,10 +26,10 @@ class _NavegarPageState extends State<NavegarPage> {
             estaLendo: true,
             progressoPorcentagem: 65,
             descricao:
-            "Estou adorando a forma como o autor explica a ciência por trás dos hábitos. Muito prático!",
+                "Estou adorando a forma como o autor explica a ciência por trás dos hábitos. Muito prático!",
             dataAtualizacao: DateTime.now().subtract(const Duration(hours: 5)),
             onTap: () {
-              print("Card clicado!");
+              debugPrint("Card clicado!");
             },
           ),
 

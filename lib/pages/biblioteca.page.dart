@@ -44,7 +44,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '1',
         titulo: 'O Poder do Hábito',
         autor: 'Charles Duhigg',
-        capaUrl: 'https://m.media-amazon.com/images/I/81YkqllaFdL._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/81YkqllaFdL._AC_UF1000,1000_QL80_.jpg',
         status: 'lendo',
         isFavorito: true,
       ),
@@ -52,7 +53,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '2',
         titulo: 'Como Fazer Amigos e Influenciar Pessoas',
         autor: 'Dale Carnegie',
-        capaUrl: 'https://m.media-amazon.com/images/I/81S0-H8jz5L._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/81S0-H8jz5L._AC_UF1000,1000_QL80_.jpg',
         status: 'lido',
         isFavorito: true,
       ),
@@ -60,7 +62,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '3',
         titulo: 'Rápido e Devagar',
         autor: 'Daniel Kahneman',
-        capaUrl: 'https://m.media-amazon.com/images/I/81P0GuZaqgL._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/81P0GuZaqgL._AC_UF1000,1000_QL80_.jpg',
         status: 'queroLer',
         isFavorito: false,
       ),
@@ -68,7 +71,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '4',
         titulo: 'Mindset: A Nova Psicologia do Sucesso',
         autor: 'Carol S. Dweck',
-        capaUrl: 'https://m.media-amazon.com/images/I/81YcWvJ1w0L._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/81YcWvJ1w0L._AC_UF1000,1000_QL80_.jpg',
         status: 'lido',
         isFavorito: false,
       ),
@@ -76,7 +80,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '5',
         titulo: 'A Arte da Guerra',
         autor: 'Sun Tzu',
-        capaUrl: 'https://m.media-amazon.com/images/I/71cGt9pLr-L._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/71cGt9pLr-L._AC_UF1000,1000_QL80_.jpg',
         status: 'queroLer',
         isFavorito: true,
       ),
@@ -84,7 +89,8 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
         id: '6',
         titulo: 'O Pequeno Príncipe',
         autor: 'Antoine de Saint-Exupéry',
-        capaUrl: 'https://m.media-amazon.com/images/I/81AOzrM1BHL._AC_UF1000,1000_QL80_.jpg',
+        capaUrl:
+            'https://m.media-amazon.com/images/I/81AOzrM1BHL._AC_UF1000,1000_QL80_.jpg',
         status: 'lendo',
         isFavorito: false,
       ),
@@ -99,16 +105,24 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
           _livrosFiltrados = List.from(_todosLivros);
           break;
         case 'Lendo':
-          _livrosFiltrados = _todosLivros.where((livro) => livro.status == 'lendo').toList();
+          _livrosFiltrados = _todosLivros
+              .where((livro) => livro.status == 'lendo')
+              .toList();
           break;
         case 'Lidos':
-          _livrosFiltrados = _todosLivros.where((livro) => livro.status == 'lido').toList();
+          _livrosFiltrados = _todosLivros
+              .where((livro) => livro.status == 'lido')
+              .toList();
           break;
         case 'Quero Ler':
-          _livrosFiltrados = _todosLivros.where((livro) => livro.status == 'queroLer').toList();
+          _livrosFiltrados = _todosLivros
+              .where((livro) => livro.status == 'queroLer')
+              .toList();
           break;
         case 'Favoritos':
-          _livrosFiltrados = _todosLivros.where((livro) => livro.isFavorito).toList();
+          _livrosFiltrados = _todosLivros
+              .where((livro) => livro.isFavorito)
+              .toList();
           break;
         default:
           _livrosFiltrados = List.from(_todosLivros);
@@ -146,9 +160,9 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Buscar livros')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Buscar livros')));
             },
           ),
         ],
@@ -189,10 +203,7 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                 const SizedBox(height: 4),
                 Text(
                   "${_livrosFiltrados.length} livros",
-                  style: TextStyle(
-                    color: MyColors.marromClaro,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: MyColors.marromClaro, fontSize: 14),
                 ),
               ],
             ),
@@ -217,47 +228,49 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
           Expanded(
             child: _livrosFiltrados.isEmpty
                 ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.menu_book,
-                    size: 80,
-                    color: MyColors.marromClaro,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Nenhum livro encontrado',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: MyColors.marromMedio,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.menu_book,
+                          size: 80,
+                          color: MyColors.marromClaro,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Nenhum livro encontrado',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: MyColors.marromMedio,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Adicione livros à sua coleção!',
+                          style: TextStyle(color: MyColors.marromClaro),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Adicione livros à sua coleção!',
-                    style: TextStyle(
-                      color: MyColors.marromClaro,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.68,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: _livrosFiltrados.length,
-              itemBuilder: (context, index) {
-                final livro = _livrosFiltrados[index];
-                return _bookCardGrid(livro);
-              },
-            ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.68,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 16,
+                        ),
+                    itemCount: _livrosFiltrados.length,
+                    itemBuilder: (context, index) {
+                      final livro = _livrosFiltrados[index];
+                      return _bookCardGrid(livro);
+                    },
+                  ),
           ),
         ],
       ),
@@ -334,34 +347,37 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                     color: MyColors.creme,
                     child: livro.capaUrl != null && livro.capaUrl!.isNotEmpty
                         ? Image.network(
-                      livro.capaUrl!,
-                      width: double.infinity,
-                      height: 130,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: MyColors.creme,
-                        child: Icon(
-                          Icons.book,
-                          size: 40,
-                          color: MyColors.abobora.withAlpha(100),
-                        ),
-                      ),
-                    )
+                            livro.capaUrl!,
+                            width: double.infinity,
+                            height: 130,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: MyColors.creme,
+                              child: Icon(
+                                Icons.book,
+                                size: 40,
+                                color: MyColors.abobora.withAlpha(100),
+                              ),
+                            ),
+                          )
                         : Container(
-                      color: MyColors.creme,
-                      child: Icon(
-                        Icons.book,
-                        size: 40,
-                        color: MyColors.abobora.withAlpha(100),
-                      ),
-                    ),
+                            color: MyColors.creme,
+                            child: Icon(
+                              Icons.book,
+                              size: 40,
+                              color: MyColors.abobora.withAlpha(100),
+                            ),
+                          ),
                   ),
                   // Badge de status
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(livro.status),
                         borderRadius: BorderRadius.circular(10),
@@ -434,7 +450,10 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
                       _mostrarMenuStatus(livro);
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(livro.status).withAlpha(20),
                         borderRadius: BorderRadius.circular(6),
@@ -483,10 +502,7 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
             children: [
               const Text(
                 'Alterar Status',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               _buildStatusOption(livro, 'Lendo', 'lendo'),
@@ -499,12 +515,18 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
     );
   }
 
-  Widget _buildStatusOption(LivroBiblioteca livro, String label, String statusValue) {
+  Widget _buildStatusOption(
+    LivroBiblioteca livro,
+    String label,
+    String statusValue,
+  ) {
     return ListTile(
       leading: Icon(
-        statusValue == 'lendo' ? Icons.menu_book :
-        statusValue == 'lido' ? Icons.check_circle :
-        Icons.bookmark_border,
+        statusValue == 'lendo'
+            ? Icons.menu_book
+            : statusValue == 'lido'
+            ? Icons.check_circle
+            : Icons.bookmark_border,
         color: _getStatusColor(statusValue),
       ),
       title: Text(label),

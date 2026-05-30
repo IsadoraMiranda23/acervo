@@ -55,13 +55,15 @@ class _LoginPageState extends State<LoginPage> {
       } catch (e) {
         print('Erro no login: $e');
 
-        String errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
+        String errorMessage =
+            'Erro ao fazer login. Verifique suas credenciais.';
 
         if (e is AuthException) {
           if (e.message.contains('Invalid login credentials')) {
             errorMessage = 'E-mail ou senha incorretos.';
           } else if (e.message.contains('Email not confirmed')) {
-            errorMessage = 'Por favor, confirme seu e-mail antes de fazer login.';
+            errorMessage =
+                'Por favor, confirme seu e-mail antes de fazer login.';
           } else if (e.message.contains('too many requests')) {
             errorMessage = 'Muitas tentativas. Tente novamente mais tarde.';
           }
@@ -123,12 +125,13 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       'Bem-vindo',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontFamily: 'Newsreader',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 36,
-                        color: MyColors.marrom,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontFamily: 'Newsreader',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 36,
+                            color: MyColors.marrom,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
@@ -156,18 +159,28 @@ class _LoginPageState extends State<LoginPage> {
                       controller: _emailController,
                       decoration: InputDecoration(
                         hintText: 'seu@email.com',
-                        prefixIcon: const Icon(Icons.email_outlined, color: MyColors.marrom),
+                        prefixIcon: const Icon(
+                          Icons.email_outlined,
+                          color: MyColors.marrom,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marromClaro),
+                          borderSide: const BorderSide(
+                            color: MyColors.marromClaro,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marromClaro),
+                          borderSide: const BorderSide(
+                            color: MyColors.marromClaro,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marrom, width: 2),
+                          borderSide: const BorderSide(
+                            color: MyColors.marrom,
+                            width: 2,
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -195,10 +208,15 @@ class _LoginPageState extends State<LoginPage> {
                       controller: _senhaController,
                       decoration: InputDecoration(
                         hintText: 'Digite sua senha',
-                        prefixIcon: const Icon(Icons.lock_outline, color: MyColors.marrom),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline,
+                          color: MyColors.marrom,
+                        ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                            _isPasswordVisible
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: MyColors.marrom,
                           ),
                           onPressed: () {
@@ -209,15 +227,22 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marromClaro),
+                          borderSide: const BorderSide(
+                            color: MyColors.marromClaro,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marromClaro),
+                          borderSide: const BorderSide(
+                            color: MyColors.marromClaro,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: MyColors.marrom, width: 2),
+                          borderSide: const BorderSide(
+                            color: MyColors.marrom,
+                            width: 2,
+                          ),
                         ),
                       ),
                       obscureText: !_isPasswordVisible,
